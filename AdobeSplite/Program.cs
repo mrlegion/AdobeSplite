@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using iText.Kernel.Pdf;
-using iText.Kernel.Pdf.Extgstate;
-using iText.Layout.Element;
 
 namespace AdobeSplite
 {
@@ -11,8 +6,14 @@ namespace AdobeSplite
     {
         static void Main(string[] args)
         {
-            string dir = @"F:\!Work\!MyProjects\CSharp\Adobe\Splite\pdf\ДЕТСКИЙ КАЛЕНДАРЬ Январь.pdf";
-            
+            string dir = @"F:\!Work\!MyProjects\CSharp\Adobe\Splite\pdf\fcom template.pdf";
+
+            var splite = new Splite(dir);
+            splite.SpliteDocument();
+
+            #region Template
+
+            /*
             PdfReader reader = new PdfReader(dir);
             PdfDocument pdf = new PdfDocument(reader);
 
@@ -89,6 +90,12 @@ namespace AdobeSplite
             Array.Copy(array, 0, temp, 0, array.Length);
             temp[temp.Length - 1] = value;
             array = temp;
+        }
+        */
+
+            #endregion
+
+            Console.ReadKey();
         }
     }
 }
