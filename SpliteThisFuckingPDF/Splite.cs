@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Windows;
 using iText.Kernel.Pdf;
 
 namespace SpliteThisFuckingPDF
@@ -42,7 +40,7 @@ namespace SpliteThisFuckingPDF
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                MessageBox.Show(e.Message);
                 throw;
             }
         }
@@ -72,7 +70,15 @@ namespace SpliteThisFuckingPDF
         {
             // Create new directory
             if (!Directory.Exists(_newDirectory))
-                Directory.CreateDirectory(_newDirectory);
+                try
+                {
+                    Directory.CreateDirectory(_newDirectory);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.Message);
+                    throw;
+                }
 
             PdfWriter writer;
             PdfDocument document;
