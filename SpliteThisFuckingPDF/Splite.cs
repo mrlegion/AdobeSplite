@@ -13,12 +13,13 @@ namespace SpliteThisFuckingPDF
         private Dictionary<string, List<int>> _splite = new Dictionary<string, List<int>>();
         private readonly string _newDirectory = "";
 
-        private readonly Dictionary<string, int[]> _formats = new Dictionary<string, int[]>() // Formats [ "Name" , int [ width, height, area ] ]
+        // Formats [ "Name" , int [ width, height, area, minArea, maxArea ] ]
+        private readonly Dictionary<string, int[]> _formats = new Dictionary<string, int[]>() 
         {
-            { "a5", new []{148, 210, 31080}},
-            { "a4", new []{210, 297, 62370}},
-            { "a3", new []{297, 420, 124740}},
-            { "a2", new []{420, 594, 249480}},
+            { "a5", new []{148, 210, 31080, 29725, 32465}},
+            { "a4", new []{210, 297, 62370, 59450, 64930}},
+            { "a3", new []{297, 420, 124740, 120350, 128350}},
+            // { "a2", new []{420, 594, 249480, 244435, 255000}}, // Enabled if need
         };
         
         public int Count { get; private set; }
@@ -35,14 +36,16 @@ namespace SpliteThisFuckingPDF
                 _reader = new PdfReader(path);
                 _pdf = new PdfDocument(_reader);
                 Count = _pdf.GetNumberOfPages();
-                Generate();
-                _newDirectory = Path.Combine(Path.GetDirectoryName(path), "splite");
             }
             catch (Exception e)
             {
                 MessageBox.Show(e.Message);
-                throw;
             }
+
+            string folder = Path.GetFileNameWithoutExtension(path) ?? "Splite Folder";
+            string basePath = Path.GetDirectoryName(path) ?? throw new InvalidOperationException();
+
+            _newDirectory = Path.Combine(basePath, folder);
         }
 
         public void Generate()
@@ -50,18 +53,13 @@ namespace SpliteThisFuckingPDF
             for (int pages = 0; pages < Count; pages++)
             {
                 var page = _pdf.GetPage(pages + 1);
-                var pageArea = GetArea(page);
+                string name = GetName(page);
 
-                if (pageArea == -1)
-                    throw new ArgumentException();
-
-                string fName = GetFormatName(pageArea) ?? GetFormatNameWithSize(page);
-
-                if (_splite.ContainsKey(fName))
-                    _splite[fName].Add(pages + 1);
+                if (_splite.ContainsKey(name))
+                    _splite[name].Add(pages + 1);
                 else
                 {
-                    _splite.Add(fName, new List<int>() { pages + 1 });
+                    _splite.Add(name, new List<int>() { pages + 1 });
                 }
             }
         }
@@ -94,37 +92,34 @@ namespace SpliteThisFuckingPDF
             }
         }
 
-        private string GetFormatName(int area)
+        private string GetName(PdfPage page)
         {
+            var size = page.GetPageSize();
+            int width = (int)Math.Floor(size.GetWidth() / 2.834);
+            int heigth = (int)Math.Floor(size.GetHeight() / 2.834);
+            var area = width * heigth;
+
+            string name = null;
+
             foreach (var format in _formats)
-                if (area == format.Value[2])
+            {
+                if (area >= format.Value[3] && area <= format.Value[4])
                 {
-                    return format.Key;
+                    name = format.Key;
                 }
+            }
 
-            return null;
+            if (name == null)
+                name = $"{width} x {heigth}";
+
+            name += $"_{GetOrientation(width, heigth)}";
+
+            return name;
         }
 
-        private int GetArea(PdfPage page)
+        private string GetOrientation(int width, int heigth)
         {
-            int result = -1;
-            
-            var pageSize = page.GetPageSize();
-            int width = (int)Math.Floor(pageSize.GetWidth() / 2.834);
-            int heigth = (int)Math.Floor(pageSize.GetHeight() / 2.834);
-            
-            result = width * heigth;
-
-            return result;
-        }
-
-        private string GetFormatNameWithSize(PdfPage page)
-        {
-            var pageSize = page.GetPageSize();
-            int width = (int)Math.Floor(pageSize.GetWidth() / 2.834);
-            int heigth = (int)Math.Floor(pageSize.GetHeight() / 2.834);
-
-            return $"{width} x {heigth}";
+            return (width < heigth) ? "vertical" : "horizontal";
         }
     }
 }

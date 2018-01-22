@@ -5,37 +5,51 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SpliteThisFuckingPDF"
         mc:Ignorable="d"
-        Title="Splite This Fucking PDF! (&gt;.&lt;)" Height="350" Width="525" WindowStartupLocation="CenterScreen">
+        Title="Splite This Fucking PDF! (&gt;.&lt;)" Icon="pdf.ico" Height="130" Width="430" WindowStartupLocation="CenterScreen">
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="35"/>
-            <RowDefinition Height="45"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="120"/>
         </Grid.ColumnDefinitions>
         
         <TextBox Margin="0 0 10 0" 
-                 Text="This Page" 
+                 Text="Click to Browse and select PDF file" 
                  Foreground="Gray"
                  VerticalContentAlignment="Center"
                  Padding="5 3 5 3"
                  Name="PathDirectory"
                  IsReadOnly="True"
-                 Grid.Column="0" Grid.Row="0"/>
+                 Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2"/>
 
         <Button Name="BrowseButton"
-                Grid.Column="1"
+                Grid.Column="2"
                 Grid.Row="0"
                 Content="Browse" Click="BrowseButton_Click"/>
-        
+
+        <Button Name="CalculateButton"
+                Grid.Column="0"
+                Grid.Row="1"
+                Margin="0 10 5 0"
+                IsEnabled="False"
+                Content="Calculate PDF" Click="CalculateButton_Click"/>
+
         <Button Name="SpliteButton"
                 Grid.Column="1"
                 Grid.Row="1"
-                Margin="0 10 0 0"
+                Margin="5 10 10 0"
+                IsEnabled="False"
                 Content="Splite PDF" Click="SpliteButton_Click"/>
+
+        <Button Name="CloseButton"
+                Grid.Column="2"
+                Grid.Row="1"
+                Margin="0 10 0 0"
+                Content="Close Window" Click="CloseButton_OnClick"/>
     </Grid>
 </Window>
