@@ -8,10 +8,26 @@ namespace SpliteThisFuckingPDF
 {
     class Splite
     {
+        /// <summary>
+        /// Reader for read pdf file
+        /// </summary>
         private readonly PdfReader _reader;
+
+        /// <summary>
+        /// PDF document
+        /// </summary>
         private readonly PdfDocument _pdf;
+
+        /// <summary>
+        /// Collection for splite group
+        /// [ format name, group numbers pages ]
+        /// </summary>
         private Dictionary<string, List<int>> _splite = new Dictionary<string, List<int>>();
-        private readonly string _newDirectory = "";
+
+        /// <summary>
+        /// Base variable for new directory where need save files
+        /// </summary>
+        private string _newDirectory;
 
         // Formats [ "Name" , int [ width, height, area, minArea, maxArea ] ]
         private readonly Dictionary<string, int[]> _formats = new Dictionary<string, int[]>() 
@@ -22,13 +38,23 @@ namespace SpliteThisFuckingPDF
             // { "a2", new []{420, 594, 249480, 244435, 255000}}, // Enabled if need
         };
         
+        /// <summary>
+        /// Number of page in select document
+        /// </summary>
         public int Count { get; private set; }
 
+        /// <summary>
+        /// Check is generation function
+        /// </summary>
         public bool IsGenerate
         {
             get { return (_splite.Count != 0); }
         }
 
+        /// <summary>
+        /// Create new object of Splite class
+        /// </summary>
+        /// <param name="path">Path to PDF file</param>
         public Splite(string path)
         {
             try
@@ -42,12 +68,17 @@ namespace SpliteThisFuckingPDF
                 MessageBox.Show(e.Message);
             }
 
+            // Get name file for new folder 
             string folder = Path.GetFileNameWithoutExtension(path) ?? "Splite Folder";
+            // Get parent folder where founding file
             string basePath = Path.GetDirectoryName(path) ?? throw new InvalidOperationException();
-
+            // Create new directory where need save new files
             _newDirectory = Path.Combine(basePath, folder);
         }
 
+        /// <summary>
+        /// Create collection split files
+        /// </summary>
         public void Generate()
         {
             for (int pages = 0; pages < Count; pages++)
@@ -64,6 +95,10 @@ namespace SpliteThisFuckingPDF
             }
         }
 
+
+        /// <summary>
+        /// Splite document
+        /// </summary>
         public void SpliteDocument()
         {
             // Create new directory
@@ -77,6 +112,15 @@ namespace SpliteThisFuckingPDF
                     MessageBox.Show(e.Message);
                     throw;
                 }
+            else
+            {
+                var folderExist = MessageBox.Show("Directory already exist! You won owerride this folder?", "Directroy exist", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (folderExist == MessageBoxResult.No)
+                {
+                    _newDirectory += "__" + Path.GetRandomFileName();
+                    Directory.CreateDirectory(_newDirectory);
+                }
+            }
 
             PdfWriter writer;
             PdfDocument document;
