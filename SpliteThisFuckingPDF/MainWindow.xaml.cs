@@ -111,8 +111,12 @@ namespace SpliteThisFuckingPDF
                         if (Path.GetExtension(s) == ".pdf" && File.Exists(s))
                         {
                             PathDirectory.Text = s;
+                            PathDirectory.IsEnabled = true;
                             _path = s;
                             CalculateButton.IsEnabled = true;
+                            DropZone.Visibility = Visibility.Hidden;
+                            DropZone.IsEnabled = false;
+                            SpliteButton.Content = "Splite PDF";
                             return;
                         }
                     }
@@ -120,18 +124,37 @@ namespace SpliteThisFuckingPDF
             }
 
             MessageBox.Show("Select incorrect file! Please, select only PDF File", "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+            DropZone.Visibility = Visibility.Hidden;
+            DropZone.IsEnabled = false;
+            SpliteButton.Content = "Splite PDF";
         }
 
-        private void PathDirectory_OnDragOver(object sender, DragEventArgs e)
+        // Event if file drag to main window
+        // Show big label
+        private void MainWindow_OnDragEnter(object sender, DragEventArgs e)
         {
+            // Show Label
+            DropZone.Visibility = Visibility;
+            DropZone.IsEnabled = true;
+
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
-                e.Effects = DragDropEffects.All;
+                e.Effects = DragDropEffects.Copy;
+                //PathDirectory.IsEnabled = false;
+                
             }
             else
             {
                 e.Effects = DragDropEffects.None;
             }
+        }
+
+        // Event to leave file on main window
+        // Hidden big label
+        private void MainWindow_OnDragLeave(object sender, DragEventArgs e)
+        {
+            DropZone.Visibility = Visibility.Hidden;
+            DropZone.IsEnabled = false;
         }
     }
 }
