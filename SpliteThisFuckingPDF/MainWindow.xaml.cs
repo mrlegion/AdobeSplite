@@ -99,5 +99,39 @@ namespace SpliteThisFuckingPDF
         {
             System.Windows.Application.Current.Shutdown();
         }
+
+        private void PathDirectory_OnDrop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                if (e.Data.GetData(DataFormats.FileDrop, true) is string[] dropPath)
+                {
+                    foreach (string s in dropPath)
+                    {
+                        if (Path.GetExtension(s) == ".pdf" && File.Exists(s))
+                        {
+                            PathDirectory.Text = s;
+                            _path = s;
+                            CalculateButton.IsEnabled = true;
+                            return;
+                        }
+                    }
+                }   
+            }
+
+            MessageBox.Show("Select incorrect file! Please, select only PDF File", "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        private void PathDirectory_OnDragOver(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effects = DragDropEffects.All;
+            }
+            else
+            {
+                e.Effects = DragDropEffects.None;
+            }
+        }
     }
 }
