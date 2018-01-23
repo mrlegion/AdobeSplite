@@ -8,7 +8,7 @@
         AllowDrop="True"
         DragEnter="MainWindow_OnDragEnter"
         DragLeave="MainWindow_OnDragLeave"
-        Title="Splite This Fucking PDF! (&gt;.&lt;)" Icon="pdf.ico" Height="130" Width="430" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+        Title="Splite This Fucking PDF! (&gt;.&lt;) .beta v1.0.3" Icon="pdf.ico" Height="130" Width="430" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="35"/>
