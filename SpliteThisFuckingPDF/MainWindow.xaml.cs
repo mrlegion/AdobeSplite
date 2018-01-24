@@ -5,6 +5,7 @@ using Microsoft.Win32;
 
 namespace SpliteThisFuckingPDF
 {
+    // TODO: Check memory resource
     public partial class MainWindow : Window
     {
         /// <summary>
@@ -73,6 +74,9 @@ namespace SpliteThisFuckingPDF
             CalculateButton.Content = "Calculated";
             SpliteButton.Content = "OK!";
             SpliteButton.IsEnabled = false;
+            
+            // Delete link on object
+            _splite = null;
         }
 
         private void CalculateButton_Click(object sender, RoutedEventArgs e)

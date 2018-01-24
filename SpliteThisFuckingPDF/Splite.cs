@@ -122,8 +122,8 @@ namespace SpliteThisFuckingPDF
                 }
             }
 
-            PdfWriter writer;
-            PdfDocument document;
+            PdfWriter writer = null;
+            PdfDocument document = null;
             
             // Create new file
             foreach (var format in _splite)
@@ -132,8 +132,16 @@ namespace SpliteThisFuckingPDF
                 document = new PdfDocument(writer);
                 _pdf.CopyPagesTo(format.Value, document);
 
+                // Close new document
                 document?.Close();
+                writer.Dispose();
             }
+            
+            writer?.Close();
+            document?.Close();
+            
+            _pdf.Close();
+            _reader.Close();
         }
 
         private string GetName(PdfPage page)
