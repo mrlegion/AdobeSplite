@@ -114,8 +114,7 @@ namespace SpliteThisFuckingPDF
                             PathDirectory.IsEnabled = true;
                             _path = s;
                             CalculateButton.IsEnabled = true;
-                            DropZone.Visibility = Visibility.Hidden;
-                            DropZone.IsEnabled = false;
+                            DragAndDropZone.Visibility = Visibility.Hidden;
                             SpliteButton.Content = "Splite PDF";
                             return;
                         }
@@ -134,8 +133,7 @@ namespace SpliteThisFuckingPDF
         private void MainWindow_OnDragEnter(object sender, DragEventArgs e)
         {
             // Show Label
-            DropZone.Visibility = Visibility;
-            DropZone.IsEnabled = true;
+            DragAndDropZone.Visibility = Visibility.Visible;
 
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
@@ -153,8 +151,7 @@ namespace SpliteThisFuckingPDF
         // Hidden big label
         private void MainWindow_OnDragLeave(object sender, DragEventArgs e)
         {
-            DropZone.Visibility = Visibility.Hidden;
-            DropZone.IsEnabled = false;
+            DragAndDropZone.Visibility = Visibility.Hidden;
         }
     }
 }
