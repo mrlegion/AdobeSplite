@@ -127,8 +127,8 @@ namespace SpliteThisFuckingPDF
             }
 
             MessageBox.Show("Select incorrect file! Please, select only PDF File", "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
-            DropZone.Visibility = Visibility.Hidden;
-            DropZone.IsEnabled = false;
+            DragAndDropZone.Visibility = Visibility.Hidden;
+            DragAndDropZone.IsEnabled = false;
             SpliteButton.Content = "Splite PDF";
         }
 
@@ -139,16 +139,7 @@ namespace SpliteThisFuckingPDF
             // Show Label
             DragAndDropZone.Visibility = Visibility.Visible;
 
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
-            {
-                e.Effects = DragDropEffects.Copy;
-                //PathDirectory.IsEnabled = false;
-                
-            }
-            else
-            {
-                e.Effects = DragDropEffects.None;
-            }
+            e.Effects = e.Data.GetDataPresent(DataFormats.FileDrop) ? DragDropEffects.Copy : DragDropEffects.None;
         }
 
         // Event to leave file on main window
