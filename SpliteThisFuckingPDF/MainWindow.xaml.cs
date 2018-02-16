@@ -5,6 +5,8 @@ using Microsoft.Win32;
 
 namespace SpliteThisFuckingPDF
 {
+    using System.ComponentModel;
+
     // TODO: Check memory resource
     public partial class MainWindow : Window
     {
@@ -16,12 +18,16 @@ namespace SpliteThisFuckingPDF
         /// <summary>
         /// Base object for splite select pdf
         /// </summary>
-        private Splite _splite;
+        private Splite _splite = null;
+
+        private BackgroundWorker worker;
+
 
         public MainWindow()
         {
             InitializeComponent();
         }
+
 
         /// <summary>
         /// Event for open file dialog and Assignment select file path to _path
@@ -58,9 +64,16 @@ namespace SpliteThisFuckingPDF
             }
             
             PathDirectory.Text = _path;
+
+            InitializeWorker();
         }
 
         private void SpliteButton_Click(object sender, RoutedEventArgs e)
+        {
+            worker.RunWorkerAsync();
+        }
+
+        private void SpliteBaseOperation()
         {
             try
             {
@@ -70,16 +83,17 @@ namespace SpliteThisFuckingPDF
             {
                 MessageBox.Show(exception.Message);
             }
-            
-            CalculateButton.Content = "Calculated";
-            SpliteButton.Content = "OK!";
-            SpliteButton.IsEnabled = false;
-            
+
             // Delete link on object
             _splite = null;
         }
 
         private void CalculateButton_Click(object sender, RoutedEventArgs e)
+        {
+            worker.RunWorkerAsync();
+        }
+
+        private void GenerateBaseList()
         {
             try
             {
@@ -90,13 +104,38 @@ namespace SpliteThisFuckingPDF
             {
                 MessageBox.Show(exception.Message);
             }
+        }
 
-            if (_splite.IsGenerate)
+        private void InitializeWorker()
+        {
+            worker = new BackgroundWorker();
+            worker.DoWork += (sender, args) =>
             {
-                CalculateButton.Content = "OK!";
-                CalculateButton.IsEnabled = false;
-                SpliteButton.IsEnabled = true;
-            }
+                if (_splite == null)
+                {
+                    GenerateBaseList();
+                    return;
+                }
+
+                SpliteBaseOperation();
+            };
+
+            worker.RunWorkerCompleted += (sender, args) =>
+            {
+                if (_splite != null && _splite.IsGenerate)
+                {
+                    CalculateButton.Content = "OK!";
+                    CalculateButton.IsEnabled = false;
+                    SpliteButton.IsEnabled = true;
+                }
+
+                if (_splite == null)
+                {
+                    CalculateButton.Content = "Calculated";
+                    SpliteButton.Content = "OK!";
+                    SpliteButton.IsEnabled = false;
+                }
+            };
         }
 
         private void CloseButton_OnClick(object sender, RoutedEventArgs e)
