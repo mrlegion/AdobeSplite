@@ -14,7 +14,7 @@ namespace PDFSplitter.ViewModels
     /// </summary>
     public class MainWindowViewModel : BindableBase
     {
-        private PdfSplitModel model;
+        private readonly PdfSplitModel model;
 
         private BackgroundWorker worker;
 
