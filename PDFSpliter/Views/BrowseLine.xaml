@@ -1,0 +1,30 @@
+﻿<UserControl x:Class="PDFSplitter.Views.BrowseLine"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:PDFSplitter.Views"
+             xmlns:viewModel="clr-namespace:PDFSplitter.ViewModels"
+             mc:Ignorable="d" 
+             d:DesignHeight="40" d:DesignWidth="500">
+    <!--Add User Dictionary-->
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="UserDictionary.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid d:DataContext="{d:DesignInstance {x:Type viewModel:MainWindowViewModel}}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="150"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBox Grid.Column="0" Grid.Row="0" Style="{DynamicResource Browse.TextBlock}" Text="{Binding File}"/>
+        
+        <Button Grid.Column="1" Grid.Row="0" Style="{DynamicResource Browse.Button}" 
+                Content="Browse PDF File" Command="{Binding BrowseCommand}"/>
+    </Grid>
+</UserControl>

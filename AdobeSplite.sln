@@ -1,11 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2024
+VisualStudioVersion = 15.0.27130.2026
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdobeSplite", "AdobeSplite\AdobeSplite.csproj", "{C1307548-28EC-4136-B0A6-3D64D13FDFE2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpliteThisFuckingPDF", "SpliteThisFuckingPDF\SpliteThisFuckingPDF.csproj", "{2A10A219-6EF8-4AD7-941C-B08E69E2266C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PDFSpliter", "PDFSpliter\PDFSpliter.csproj", "{5FDFC468-8327-4D6F-A02C-22E981599DA2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PDFSpliter.Model", "PDFSpliter.Model\PDFSpliter.Model.csproj", "{3F1B2938-8639-40B7-B4FC-EF005007EAE6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,6 +30,18 @@ Global
 		{2A10A219-6EF8-4AD7-941C-B08E69E2266C}.End|Any CPU.Build.0 = End|Any CPU
 		{2A10A219-6EF8-4AD7-941C-B08E69E2266C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A10A219-6EF8-4AD7-941C-B08E69E2266C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5FDFC468-8327-4D6F-A02C-22E981599DA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FDFC468-8327-4D6F-A02C-22E981599DA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FDFC468-8327-4D6F-A02C-22E981599DA2}.End|Any CPU.ActiveCfg = Release|Any CPU
+		{5FDFC468-8327-4D6F-A02C-22E981599DA2}.End|Any CPU.Build.0 = Release|Any CPU
+		{5FDFC468-8327-4D6F-A02C-22E981599DA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FDFC468-8327-4D6F-A02C-22E981599DA2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F1B2938-8639-40B7-B4FC-EF005007EAE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F1B2938-8639-40B7-B4FC-EF005007EAE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F1B2938-8639-40B7-B4FC-EF005007EAE6}.End|Any CPU.ActiveCfg = Release|Any CPU
+		{3F1B2938-8639-40B7-B4FC-EF005007EAE6}.End|Any CPU.Build.0 = Release|Any CPU
+		{3F1B2938-8639-40B7-B4FC-EF005007EAE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F1B2938-8639-40B7-B4FC-EF005007EAE6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
