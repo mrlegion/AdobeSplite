@@ -1,7 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Windows;
+using System.Windows.Input;
+using GongSolutions.Wpf.DragDrop;
 using Prism.Commands;
 using Prism.Mvvm;
 using Microsoft.WindowsAPICodePack.Dialogs;
@@ -16,15 +19,11 @@ namespace PDFSplitter.ViewModels
     {
         private readonly PdfSplitModel model;
 
-        private BackgroundWorker worker;
-
-        private bool isCalculated;
-
-        private bool isSeparation;
-
         private string parent = null;
 
         private string file;
+
+        private bool isDrop;
 
         /// <summary>
         /// Create MainWindowViewModel element
@@ -39,14 +38,21 @@ namespace PDFSplitter.ViewModels
             File = "Click Browse button or drop file in program";
 
             model = new PdfSplitModel();
-
             model.PropertyChanged += (sender, args) => { RaisePropertyChanged(args.PropertyName); };
 
             BrowseCommand = new DelegateCommand(this.GetBrowseDialog);
 
-            CalculatedCommand = new DelegateCommand(() => {});
+            // TODO: Can delete this code
+            //CalculatedCommand = new DelegateCommand(() =>
+            //{
+            //    model.Generate();
+            //});
 
-            SeparationCommand = new DelegateCommand(() => {});
+            SeparationCommand = new DelegateCommand(() =>
+            {
+                model.Separate();
+                File = "Click Browse button or drop file in program";
+            });
 
             CloseCommand = new DelegateCommand<Window>(window =>
             {
@@ -59,10 +65,11 @@ namespace PDFSplitter.ViewModels
         /// </summary>
         public DelegateCommand BrowseCommand { get; }
 
+        // TODO: Delete this code later
         /// <summary>
         /// Gets command for calculated selected pdf file
         /// </summary>
-        public DelegateCommand CalculatedCommand { get; }
+        //public DelegateCommand CalculatedCommand { get; }
 
 
         /// <summary>
@@ -76,27 +83,28 @@ namespace PDFSplitter.ViewModels
         public DelegateCommand<Window> CloseCommand { get; }
 
         /// <summary>
-        /// Gets or sets value for calculated state
+        /// Gets or sets state of drop file on window 
         /// </summary>
-        public bool IsCalculated
+        public bool IsDrop
         {
-            get => isCalculated;
-            set => SetProperty(ref isCalculated, value);
+            get => isDrop;
+            set => SetProperty(ref isDrop, value);
         }
 
         /// <summary>
-        /// Gets or sets value for separation state
+        /// Gets or sets load file state in model
         /// </summary>
-        public bool IsSeparation
-        {
-            get => isSeparation;
-            set => SetProperty(ref isSeparation, value);
-        }
+        public bool IsLoaded => model.IsLoaded;
 
         /// <summary>
         /// Gets state of processing calculated or separated
         /// </summary>
-        public bool InProcessing { get; }
+        public bool InProcessing => model.InProcessing;
+
+        /// <summary>
+        /// Gets visibility state on root grid on window frame
+        /// </summary>
+        public bool IsVisibility => !IsDrop;
 
         /// <summary>
         /// Gets or sets path to pdf file
@@ -129,10 +137,23 @@ namespace PDFSplitter.ViewModels
                 return;
             }
 
-            File = dialog.FileName;
-            parent = Path.GetDirectoryName(dialog.FileName);
+            BaseSettings(dialog.FileName);
+        }
 
-            IsCalculated = true;
+        /// <summary>
+        /// Base settings on window load file
+        /// </summary>
+        /// <param name="file">Path to file</param>
+        public void BaseSettings(string file)
+        {
+            File = file;
+            parent = Path.GetDirectoryName(file);
+
+            IsDrop = false;
+
+            model.SetFile(File);
+
+            
         }
     }
 }

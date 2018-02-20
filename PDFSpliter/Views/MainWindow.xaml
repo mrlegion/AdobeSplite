@@ -3,15 +3,21 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:PDFSplitter"
         xmlns:views="clr-namespace:PDFSplitter.Views"
         xmlns:viewModel="clr-namespace:PDFSplitter.ViewModels"
+        xmlns:converters="clr-namespace:PDFSplitter.Converters"
+        xmlns:dnd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.WPF.DragDrop"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         mc:Ignorable="d" x:Name="Window"
-        Background="White" WindowStartupLocation="CenterScreen" 
+        Background="White" WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize" WindowState="Normal" WindowStyle="SingleBorderWindow"
-        Title="MainWindow" Height="150" Width="500" Topmost="True">
+        Title="PDFSeparate v0.2.0c" Height="150" Width="500" AllowDrop="True"
+        DragEnter="DragEnterHandler" DragLeave="DragLeaveHandler">
+
     <Window.Resources>
         <ResourceDictionary>
+            <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+            <converters:BoolReverseConverter x:Key="BoolReverseConverter"/>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="UserDictionary.xaml"/>
             </ResourceDictionary.MergedDictionaries>
@@ -22,37 +28,41 @@
         <viewModel:MainWindowViewModel/>
     </Window.DataContext>
 
-    <Grid Name="RootGrid">
-        <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*"/>
-            <ColumnDefinition Width="160"/>
-        </Grid.ColumnDefinitions>
-
-        <views:BrowseLine Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Margin="10 20 10 0"/>
-
-        <Grid Grid.Column="0" Grid.Row="1" Margin="10 6 0 10">
+    <Grid AllowDrop="True">
+        <Grid IsEnabled="{Binding IsDrop, Converter={StaticResource BoolReverseConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="160"/>
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="0" Grid.Row="0" Margin="0,5,10,0" x:Name="Calculated" Command="{Binding CalculatedCommand}"
-                    Style="{DynamicResource Button.Custom.Main}" Content="Calculated File" IsEnabled="{Binding IsCalculated}"/>
-            <Button Grid.Column="1" Grid.Row="0" Margin="0,5,10,0" x:Name="Splite" Command="{Binding SeparationCommand}"
-                    Style="{DynamicResource Button.Custom.Main}" Content="Splite PDF file" IsEnabled="{Binding IsSeparation}"/>
-        </Grid>
+            <views:BrowseLine Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Margin="10 20 10 0"/>
 
-        <Button Grid.Column="1" Grid.Row="1" Margin="0 11 10 10" 
+            <Grid Grid.Column="0" Grid.Row="1" Margin="10 6 0 10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <!--<Button Grid.Column="0" Grid.Row="0" Margin="0,5,10,0" x:Name="Calculated" Command="{Binding CalculatedCommand}"
+                    Style="{DynamicResource Button.Custom.Main}" Content="Calculated File" IsEnabled="{Binding IsCalculated}"/>-->
+                <Button Grid.Column="1" Grid.Row="0" Margin="0,5,10,0" x:Name="SeparateButton" Command="{Binding SeparationCommand}"
+                    Style="{DynamicResource Button.Custom.Main}" Content="Separate PDF file" IsEnabled="{Binding IsLoaded}"/>
+            </Grid>
+
+            <Button Grid.Column="1" Grid.Row="1" Margin="0 11 10 10" 
                 Style="{DynamicResource Button.Custom.Main}" Content="Close Program"
                 Command="{Binding CloseCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type Window}}}"/>
-        
-        <views:DragAndDropUserController Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Grid.RowSpan="2" Visibility="Collapsed"/>
+        </Grid>
 
-        <views:ProgressUserControl Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Grid.RowSpan="2" Visibility="Collapsed"/>
-        
+        <views:ProgressUserControl Visibility="{Binding InProcessing, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+        <views:DragAndDropUserController Visibility="{Binding IsDrop, Converter={StaticResource BoolToVisibilityConverter}}"
+                                         Width="500" Height="150" AllowDrop="True" Drop="DropEventHandler"/>
     </Grid>
+
+    
 </Window>
