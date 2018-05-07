@@ -18,23 +18,25 @@ namespace PDFSplitter.Model
 
     #endregion
 
+    enum WorkType
+    {
+        Fill,
+        Separate,
+        All
+    }
+
     /// <summary>
     /// Business model for project PDFSplitter
     /// </summary>
-    public class PdfSplitModel : BindableBase
+    public class PdfSplitModel : BindableBase, IDisposable
     {
-        private readonly BackgroundWorker worker = new BackgroundWorker()
-        {
-            WorkerReportsProgress = true
-        };
+        private readonly BackgroundWorker worker = new BackgroundWorker();
 
         private bool inProcessing;
 
         private bool isLoaded;
 
         private int progress;
-
-        private int step;
 
         private PdfReader reader;
 
@@ -46,16 +48,20 @@ namespace PDFSplitter.Model
 
         private string filepath = null;
 
-        private Dictionary<string, List<int>> splite = new Dictionary<string, List<int>>();
+        private Dictionary<string, List<int>> splite = null;
+
+        public bool IsCancelled { get; set; }
 
         /// <summary>
         /// Create new PdfSplitModel constructor
         /// </summary>
         public PdfSplitModel()
         {
-            worker.DoWork += new DoWorkEventHandler(WorkerStartWork);
+            worker.WorkerReportsProgress = true;
+            worker.WorkerSupportsCancellation = true;
+            worker.DoWork += WorkerStartWork;
             worker.ProgressChanged += (sender, args) => Progress += args.ProgressPercentage;
-            worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(WorkerEndWork);
+            worker.RunWorkerCompleted += WorkerEndWork;
         }
 
         /// <summary>
@@ -68,12 +74,17 @@ namespace PDFSplitter.Model
             string folder = Path.GetFileNameWithoutExtension(filepath) ?? "Separator folder";
             string parent = Path.GetDirectoryName(filepath) ?? throw new InvalidOperationException();
             newDirectory = Path.Combine(parent, folder);
-
-            worker.RunWorkerAsync();
+            worker.RunWorkerAsync(WorkType.Fill);
         }
 
         private void WorkerEndWork(object sender, RunWorkerCompletedEventArgs e)
         {
+            if (e.Cancelled)
+            {
+                IsCancelled = true;
+                return;
+            }
+
             InProcessing = false;
             Progress = 0;
         }
@@ -81,41 +92,83 @@ namespace PDFSplitter.Model
         private void WorkerStartWork(object sender, DoWorkEventArgs e)
         {
             InProcessing = true;
+            int step = 0;
 
-            if (!IsLoaded)
+            if (worker.CancellationPending)
             {
-                worker.ReportProgress(10);
-                reader = new PdfReader(filepath);
-                worker.ReportProgress(50);
-                document = new PdfDocument(reader);
-                worker.ReportProgress(75);
-                count = document.GetNumberOfPages();
-
-                IsLoaded = true;
-
-                FillPageCollection();
-
+                e.Cancel = true;
                 return;
             }
 
-            CreateDirectory();
-
-            int step = 100 / splite.Count;
-
-            foreach (var formats in splite)
+            if (e.Argument is WorkType type)
             {
-                CreateFiles(formats.Key, formats.Value);
-                worker.ReportProgress(step);
-            }
-            
-            reader?.Close();
-            document?.Close();
+                switch (type)
+                {
+                    case WorkType.Fill:
+                        worker.ReportProgress(10);
+                        reader = new PdfReader(filepath);
 
-            IsLoaded = false;
+                        worker.ReportProgress(50);
+                        document = new PdfDocument(reader);
+
+                        worker.ReportProgress(75);
+                        count = document.GetNumberOfPages();
+
+                        FillPageCollection();
+
+                        break;
+                    case WorkType.Separate:
+                        CreateDirectory();
+
+                        step = 100 / splite.Count;
+
+                        foreach (var formats in splite)
+                        {
+                            CreateFiles(formats.Key, formats.Value);
+                            worker.ReportProgress(step);
+                        }
+
+                        reader?.Close();
+                        document?.Close();
+
+                        IsLoaded = false;
+                        break;
+                    case WorkType.All:
+                        worker.ReportProgress(2);
+                        reader = new PdfReader(filepath);
+
+                        worker.ReportProgress(5);
+                        document = new PdfDocument(reader);
+
+                        worker.ReportProgress(10);
+                        count = document.GetNumberOfPages();
+
+                        FillPageCollection();
+                        CreateDirectory();
+
+                        step = 90 / splite.Count;
+
+                        foreach (var formats in splite)
+                        {
+                            CreateFiles(formats.Key, formats.Value);
+                            worker.ReportProgress(step);
+                        }
+
+                        reader?.Close();
+                        document?.Close();
+
+                        IsLoaded = false;
+
+                        Environment.Exit(0);
+                        break;
+                }
+            }
         }
 
         private void FillPageCollection()
         {
+            splite = new Dictionary<string, List<int>>();
+
             for (int pages = 0; pages < count; pages++)
             {
                 var page = document.GetPage(pages + 1);
@@ -130,6 +183,8 @@ namespace PDFSplitter.Model
 
                 worker.ReportProgress(pages * (100 / count));
             }
+
+            IsLoaded = true;
         }
 
         /// <summary>
@@ -172,7 +227,7 @@ namespace PDFSplitter.Model
         /// </summary>
         public void Separate()
         {
-            worker.RunWorkerAsync();
+            worker.RunWorkerAsync(WorkType.Separate);
         }
 
         /// <summary>
@@ -212,13 +267,27 @@ namespace PDFSplitter.Model
         {
             // Create new file in new directory
             string filename = Path.Combine(newDirectory, $"{name}.pdf");
-            PdfWriter writer = new PdfWriter(new FileStream(filename, FileMode.Create));
-            PdfDocument file = new PdfDocument(writer);
+            FileStream file = new FileStream(filename, FileMode.Create, FileAccess.ReadWrite);
+            PdfWriter writer = null;
+            PdfDocument document = null;
+            try
+            {
+                writer = new PdfWriter(file);
+                document = new PdfDocument(writer);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+            
+            if (writer == null || document == null)
+                throw new Exception("Writer or Document is null");
 
-            document.CopyPagesTo(pages, file);
+            // TODO: бить файл
+            this.document.CopyPagesTo(pages, document);
 
             // Close new document
-            file?.Close();
+            document?.Close();
             writer?.Close();
         }
 
@@ -267,6 +336,29 @@ namespace PDFSplitter.Model
         private string GetNameOrientation(int width, int height)
         {
             return width < height ? "vertical" : "horizontal";
+        }
+
+        public void Canceled()
+        {
+            if (worker.WorkerSupportsCancellation)
+                worker.CancelAsync();
+        }
+
+        public void StartProccess(string file)
+        {
+            filepath = file;
+            string folder = Path.GetFileNameWithoutExtension(filepath) ?? "Separator folder";
+            string parent = Path.GetDirectoryName(filepath) ?? throw new InvalidOperationException();
+            newDirectory = Path.Combine(parent, folder);
+            InProcessing = true;
+            worker.RunWorkerAsync(WorkType.All);
+        }
+
+        public void Dispose()
+        {
+            worker?.Dispose();
+            ((IDisposable)reader)?.Dispose();
+            ((IDisposable)document)?.Dispose();
         }
     }
 }

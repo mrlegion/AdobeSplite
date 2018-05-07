@@ -17,7 +17,7 @@ namespace PDFSplitter.ViewModels
     /// </summary>
     public class MainWindowViewModel : BindableBase
     {
-        private readonly PdfSplitModel model;
+        private PdfSplitModel model;
 
         private string parent = null;
 
@@ -41,12 +41,6 @@ namespace PDFSplitter.ViewModels
             model.PropertyChanged += (sender, args) => { RaisePropertyChanged(args.PropertyName); };
 
             BrowseCommand = new DelegateCommand(this.GetBrowseDialog);
-
-            // TODO: Can delete this code
-            //CalculatedCommand = new DelegateCommand(() =>
-            //{
-            //    model.Generate();
-            //});
 
             SeparationCommand = new DelegateCommand(() =>
             {
@@ -151,9 +145,13 @@ namespace PDFSplitter.ViewModels
 
             IsDrop = false;
 
-            model.SetFile(File);
+            model.Dispose();
 
-            
+            model.SetFile(File);
         }
+
+        public void Start(string file) => model.StartProccess(file);
+
+        public void Canceled() => model.Canceled();
     }
 }

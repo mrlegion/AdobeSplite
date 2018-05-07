@@ -11,7 +11,7 @@
         mc:Ignorable="d" x:Name="Window"
         Background="White" WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize" WindowState="Normal" WindowStyle="SingleBorderWindow"
-        Title="PDFSeparate v0.2.0c" Height="150" Width="500" AllowDrop="True"
+        Title="PDFSeparate v0.3.0a" Height="150" Width="500" AllowDrop="True"
         DragEnter="DragEnterHandler" DragLeave="DragLeaveHandler">
 
     <Window.Resources>

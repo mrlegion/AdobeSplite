@@ -117,8 +117,12 @@
     <Compile Include="Converters\BoolReverseConverter.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="Helpers\PropertyHelper.cs" />
+    <Compile Include="ViewModels\ProgressWindowViewModel.cs" />
     <Compile Include="Views\ProgressUserControl.xaml.cs">
       <DependentUpon>ProgressUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ProgressWindow.xaml.cs">
+      <DependentUpon>ProgressWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="Views\BrowseLine.xaml">
       <SubType>Designer</SubType>
@@ -148,6 +152,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\ProgressUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ProgressWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
