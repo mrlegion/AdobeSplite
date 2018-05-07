@@ -265,29 +265,70 @@ namespace PDFSplitter.Model
         /// <param name="pages">Collection pages</param>
         private void CreateFiles(string name, List<int> pages)
         {
-            // Create new file in new directory
-            string filename = Path.Combine(newDirectory, $"{name}.pdf");
-            FileStream file = new FileStream(filename, FileMode.Create, FileAccess.ReadWrite);
-            PdfWriter writer = null;
-            PdfDocument document = null;
-            try
-            {
-                writer = new PdfWriter(file);
-                document = new PdfDocument(writer);
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }
             
-            if (writer == null || document == null)
-                throw new Exception("Writer or Document is null");
-
+            PdfWriter writer = null;
+            PdfDocument doc = null;
+            
             // TODO: бить файл
-            this.document.CopyPagesTo(pages, document);
+            // назначаем количество по которому требуется бить файл
+            int size = (name.Contains("a3")) ? 1000 : 2000;
+            // определяем сколько частей
+            var stack = Math.Floor((double)(pages.Count / size));
+            // если частей больше одной, то начинаем деление
+            if (stack > 1)
+            {
+                var temp = new List<int>(pages); 
+                for (int i = 0; i <= stack; i++)
+                {
+                    // Create new file in new directory
+                    string filename = Path.Combine(newDirectory, $"{name}_{i + 1}.pdf");
+                    FileStream file = new FileStream(filename, FileMode.Create, FileAccess.ReadWrite);
+
+                    try
+                    {
+                        writer = new PdfWriter(file);
+                        doc = new PdfDocument(writer);
+
+                        if (temp.Count - size > 0)
+                        {
+                            var range = temp.GetRange(0, size);
+                            document.CopyPagesTo(range, doc);
+                            temp.RemoveRange(0, size);
+                        }
+                        else document.CopyPagesTo(temp, doc);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new Exception(e.Message);
+                    }
+
+                    doc.Close();
+                    writer.Close();
+
+                    doc = null;
+                    writer = null;
+                }
+            }
+            else
+            {
+                // Create new file in new directory
+                string filename = Path.Combine(newDirectory, $"{name}.pdf");
+                FileStream file = new FileStream(filename, FileMode.Create, FileAccess.ReadWrite);
+
+                try
+                {
+                    writer = new PdfWriter(file);
+                    doc = new PdfDocument(writer);
+                    document.CopyPagesTo(pages, doc);
+                }
+                catch (Exception e)
+                {
+                    throw new Exception(e.Message);
+                }
+            }
 
             // Close new document
-            document?.Close();
+            doc?.Close();
             writer?.Close();
         }
 
